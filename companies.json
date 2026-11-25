@@ -1,0 +1,14 @@
+{
+  "companies": [
+    {"name": "GitLab", "ats": "greenhouse", "token": "gitlab"},
+    {"name": "Grammarly", "ats": "greenhouse", "token": "grammarly"},
+    {"name": "Elastic", "ats": "greenhouse", "token": "elastic"},
+    {"name": "MongoDB", "ats": "greenhouse", "token": "mongodb"},
+    {"name": "Cloudflare", "ats": "greenhouse", "token": "cloudflare"},
+    {"name": "Twilio", "ats": "greenhouse", "token": "twilio"},
+    {"name": "Stripe", "ats": "greenhouse", "token": "stripe"},
+    {"name": "Spotify", "ats": "lever", "token": "spotify"},
+    {"name": "Notion", "ats": "ashby", "token": "notion"},
+    {"name": "Ramp", "ats": "ashby", "token": "ramp"}
+  ]
+}

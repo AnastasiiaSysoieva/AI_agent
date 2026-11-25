@@ -1,0 +1,63 @@
+{
+  "paused": false,
+  "min_score": 7,
+  "hours_old": 24,
+  "max_llm_per_run": 25,
+  "llm_pause_sec": 7,
+  "gemini_model": "gemini-2.5-flash",
+  "send_summary": false,
+  "timezone": "Europe/Kyiv",
+  "sources": {
+    "jobspy": true,
+    "aggregators": true,
+    "rss": true,
+    "companies": true
+  },
+  "search_terms": [
+    "junior python developer",
+    "python backend developer junior",
+    "django rest framework developer",
+    "fastapi developer",
+    "trainee python"
+  ],
+  "jobspy_location": "Europe",
+  "jobspy_results_per_term": 15,
+  "stop_words": [
+    "senior",
+    "sr",
+    "sr.",
+    "lead",
+    "principal",
+    "staff",
+    "head of",
+    "architect",
+    "manager",
+    "director",
+    "qa",
+    "tester",
+    "data scientist",
+    "machine learning",
+    "ml",
+    "c++",
+    "java",
+    "php",
+    ".net",
+    "asp.net",
+    "golang",
+    "ruby",
+    "frontend",
+    "front-end",
+    "react",
+    "devops",
+    "sre",
+    "embedded",
+    "unity"
+  ],
+  "rss_feeds": {
+    "WeWorkRemotely": "https://weworkremotely.com/categories/remote-back-end-programming-jobs.rss",
+    "Python.org Jobs": "https://www.python.org/jobs/feed/rss/",
+    "DOU": "https://jobs.dou.ua/vacancies/feeds/?remote&category=Python",
+    "Djinni": "https://djinni.co/jobs/rss/?primary_keyword=Python&employment=remote"
+  },
+  "profile": "Candidate: Python Backend Developer, Junior / Trainee level, about 1 year of experience.\nStack: Python, Django, Django REST Framework, FastAPI, SQL (PostgreSQL), pytest, Docker, Nginx.\nEnglish: B1-B2 (intermediate). Jobs requiring fluent / C1+ English or heavy daily client communication in English are a minus.\nLocation: lives in Ukraine (Europe/Kyiv timezone). Wants REMOTE work. Jobs restricted to residents of the US/Canada/UK only, office-only jobs and jobs that require relocation = low score.\nExperience: up to 1-2 years required is fine; 3+ years of commercial experience required = low score."
+}

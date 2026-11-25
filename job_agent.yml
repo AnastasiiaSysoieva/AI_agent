@@ -1,0 +1,64 @@
+name: Job Agent
+
+on:
+  schedule:
+    - cron: "0 */3 * * *"      # полный поиск вакансий каждые 3 часа
+    - cron: "7,37 * * * *"     # только обработка команд бота (каждые 30 минут)
+  workflow_dispatch:           # ручной запуск из вкладки Actions
+
+permissions:
+  contents: write
+
+concurrency:
+  group: job-agent
+  cancel-in-progress: false
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+      TG_BOT_TOKEN: ${{ secrets.TG_BOT_TOKEN }}
+      TG_CHAT_ID: ${{ secrets.TG_CHAT_ID }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install bot dependencies
+        run: pip install requests
+
+      - name: Handle Telegram commands
+        id: bot
+        continue-on-error: true   # сбой Telegram не должен отменять поиск вакансий
+        run: python bot.py
+
+      - name: Install search dependencies
+        if: github.event.schedule != '7,37 * * * *' || steps.bot.outputs.run_now == 'true'
+        run: pip install -r requirements.txt
+
+      - name: Search vacancies
+        if: github.event.schedule != '7,37 * * * *' || steps.bot.outputs.run_now == 'true'
+        run: python scraper.py
+
+      - name: Save data (config, memory, state)
+        if: always()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          for f in config.json companies.json state.json seen_jobs.json; do
+            if [ -f "$f" ]; then git add "$f"; fi
+          done
+          if git diff --cached --quiet; then
+            echo "No changes to save"
+          else
+            git commit -m "chore: update agent data"
+            for i in 1 2 3; do
+              git pull --rebase origin "$GITHUB_REF_NAME" && git push && break
+              sleep 5
+            done
+          fi
