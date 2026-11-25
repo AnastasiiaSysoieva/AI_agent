@@ -1,11 +1,11 @@
 {
-  "tg_offset": 580957379,
+  "tg_offset": 580957380,
   "commands_set": true,
   "sent": {},
   "last_run": {
-    "time": "2026-11-25T11:50:56.863465+00:00",
-    "collected": 428,
-    "candidates": 97,
+    "time": "2026-11-25T12:00:07.627859+00:00",
+    "collected": 474,
+    "candidates": 121,
     "evaluated": 0,
     "sent": 0,
     "errors": [
