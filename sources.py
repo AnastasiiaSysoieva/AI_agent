@@ -30,35 +30,46 @@ def _fresh(value, hours: float) -> bool:
 def fetch_jobspy(cfg: dict) -> list[Job]:
     from jobspy import scrape_jobs  # heavy import, only when needed
 
+    # LinkedIn searches a region; Indeed needs a real country name ("worldwide" is rejected).
+    # Indeed does not combine hours_old with is_remote, so "remote" goes into the query instead.
+    plans = [
+        ("linkedin", "", {"location": cfg["jobspy_location"], "is_remote": True,
+                          "linkedin_fetch_description": True}),
+        ("indeed", " remote", {"location": cfg["jobspy_indeed_location"],
+                               "country_indeed": cfg["jobspy_indeed_country"]}),
+    ]
     jobs: list[Job] = []
+    attempts = failures = 0
     for term in cfg["search_terms"]:
-        try:
-            df = scrape_jobs(
-                site_name=["linkedin", "indeed"],
-                search_term=term,
-                location=cfg["jobspy_location"],
-                results_wanted=cfg["jobspy_results_per_term"],
-                hours_old=cfg["hours_old"],
-                is_remote=True,
-                country_indeed="worldwide",
-                linkedin_fetch_description=True,
-                verbose=0,
-            )
-        except Exception as e:  # noqa: BLE001
-            log.error("jobspy failed for '%s': %s", term, e)
-            continue
-        for row in df.to_dict("records"):
-            url = clean(row.get("job_url"))
-            if url:
-                jobs.append(
-                    make_job(
-                        url, row.get("title"), row.get("company"),
-                        clean(row.get("location")) or "Remote",
-                        row.get("description"), clean(row.get("site")).capitalize() or "jobspy",
-                    )
+        for site, suffix, extra in plans:
+            attempts += 1
+            try:
+                df = scrape_jobs(
+                    site_name=[site],
+                    search_term=term + suffix,
+                    results_wanted=cfg["jobspy_results_per_term"],
+                    hours_old=cfg["hours_old"],
+                    verbose=0,
+                    **extra,
                 )
-        log.info("jobspy '%s': %d rows", term, len(df))
-        time.sleep(2)
+            except Exception as e:  # noqa: BLE001
+                failures += 1
+                log.error("jobspy %s failed for '%s': %s", site, term, str(e)[:300])
+                continue
+            for row in df.to_dict("records"):
+                url = clean(row.get("job_url"))
+                if url:
+                    jobs.append(
+                        make_job(
+                            url, row.get("title"), row.get("company"),
+                            clean(row.get("location")) or "Remote",
+                            row.get("description"), clean(row.get("site")).capitalize() or site.capitalize(),
+                        )
+                    )
+            log.info("jobspy %s '%s': %d rows", site, term, len(df))
+            time.sleep(2)
+    if attempts and failures == attempts:
+        raise RuntimeError("all LinkedIn/Indeed requests failed")
     return jobs
 
 
@@ -176,7 +187,7 @@ def fetch_rss(cfg: dict) -> list[Job]:
 #    generic link scraper ("custom").
 # =========================================================================== #
 def _src(c: dict) -> str:
-    return f"{c.get('name') or c.get('token')} · сайт компании"
+    return f"{c.get('name') or c.get('token')} · сайт компанії"
 
 
 def _remote(loc, flag) -> str:
@@ -237,7 +248,7 @@ def _smartrecruiters(c: dict) -> list[Job]:
         place = ", ".join(x for x in (loc.get("city"), (loc.get("country") or "").upper()) if x)
         out.append(make_job(
             f"https://jobs.smartrecruiters.com/{c['token']}/{j['id']}", j.get("name"), c.get("name"),
-            _remote(place, loc.get("remote")), "Найдено по запросу 'python' (описание через API недоступно)", _src(c)))
+            _remote(place, loc.get("remote")), "Знайдено за запитом 'python' (опис через API недоступний)", _src(c)))
     return out
 
 
@@ -289,7 +300,7 @@ def _custom(c: dict) -> list[Job]:
         if full in seen:
             continue
         seen.add(full)
-        jobs.append(make_job(full, text, c.get("name"), "см. страницу вакансии", text, _src(c), trusted=True))
+        jobs.append(make_job(full, text, c.get("name"), "див. сторінку вакансії", text, _src(c), trusted=True))
     if not jobs:
         log.warning("%s: no matching links (the page may be rendered by JavaScript)", c.get("name"))
     return jobs
@@ -372,7 +383,7 @@ def resolve_company(arg: str) -> tuple[dict | None, str | None]:
             try:
                 found = detect_ats(http("GET", arg, retries=1, timeout=20).text)
             except Exception as e:  # noqa: BLE001
-                return None, f"не удалось открыть страницу ({type(e).__name__})"
+                return None, f"не вдалося відкрити сторінку ({type(e).__name__})"
         if found:
             return {"name": _pretty(found[1]), "ats": found[0], "token": found[1]}, None
         return {"name": _domain_name(arg), "ats": "custom", "url": arg}, None
@@ -386,5 +397,5 @@ def resolve_company(arg: str) -> tuple[dict | None, str | None]:
                     return cand, None
             except Exception:  # noqa: BLE001 - 404 means "not on this ATS"
                 continue
-        return None, "не нашёл эту компанию ни в одной из известных систем найма. Пришлите ссылку на страницу вакансий"
-    return None, "не понял запрос. Пришлите ссылку на страницу вакансий или формат greenhouse:название"
+        return None, "не знайшов цю компанію в жодній з відомих систем найму. Надішліть посилання на сторінку вакансій"
+    return None, "не зрозумів запит. Надішліть посилання на сторінку вакансій або формат greenhouse:назва"

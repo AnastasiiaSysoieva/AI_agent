@@ -42,7 +42,8 @@ DEFAULT_CONFIG: dict = {
     "hours_old": 24,
     "max_llm_per_run": 25,
     "llm_pause_sec": 7,
-    "gemini_model": "gemini-2.5-flash",
+    # tried in order; if a model answers 404 (retired / not available to new users) the next one is used
+    "gemini_models": ["gemini-3.8-flash", "gemini-flash-latest", "gemini-2.5-flash"],
     "send_summary": False,
     "timezone": "Europe/Kyiv",
     "sources": {"jobspy": True, "aggregators": True, "rss": True, "companies": True},
@@ -53,7 +54,9 @@ DEFAULT_CONFIG: dict = {
         "fastapi developer",
         "trainee python",
     ],
-    "jobspy_location": "Europe",
+    "jobspy_location": "Europe",            # LinkedIn region
+    "jobspy_indeed_location": "Ukraine",    # Indeed needs a real country (not "worldwide")
+    "jobspy_indeed_country": "ukraine",
     "jobspy_results_per_term": 15,
     "stop_words": [
         "senior", "sr", "sr.", "lead", "principal", "staff", "head of", "architect",
@@ -248,10 +251,10 @@ def job_keyboard(job_id: str, saved: bool = False, applied: bool = False) -> dic
     return {
         "inline_keyboard": [
             [
-                {"text": "⭐ Сохранено" if saved else "⭐ Сохранить", "callback_data": f"save:{job_id}"},
-                {"text": "✅ Откликнулся" if applied else "✅ Откликнуться", "callback_data": f"applied:{job_id}"},
+                {"text": "⭐ Збережено" if saved else "⭐ Зберегти", "callback_data": f"save:{job_id}"},
+                {"text": "✅ Відгукнувся" if applied else "✅ Відгукнутися", "callback_data": f"applied:{job_id}"},
             ],
-            [{"text": "🙈 Скрыть", "callback_data": f"hide:{job_id}"}],
+            [{"text": "🙈 Сховати", "callback_data": f"hide:{job_id}"}],
         ]
     }
 
