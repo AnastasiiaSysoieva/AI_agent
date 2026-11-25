@@ -1,0 +1,16 @@
+{
+  "tg_offset": 580957376,
+  "commands_set": true,
+  "sent": {},
+  "last_run": {
+    "time": "2026-11-25T11:45:50.714707+00:00",
+    "collected": 427,
+    "candidates": 96,
+    "evaluated": 0,
+    "sent": 0,
+    "errors": [
+      "Grammarly",
+      "gemini"
+    ]
+  }
+}
