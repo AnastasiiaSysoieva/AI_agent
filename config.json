@@ -4,7 +4,7 @@
   "hours_old": 24,
   "max_llm_per_run": 25,
   "llm_pause_sec": 7,
-  "gemini_model": "gemini-2.5-flash",
+  "gemini_model": "gemini-2.5-flash-lite",
   "send_summary": false,
   "timezone": "Europe/Kyiv",
   "sources": {
