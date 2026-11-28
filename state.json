@@ -3,9 +3,9 @@
   "commands_set": true,
   "sent": {},
   "last_run": {
-    "time": "2026-11-28T02:59:37.802253+00:00",
-    "collected": 548,
-    "candidates": 111,
+    "time": "2026-11-28T11:24:45.185841+00:00",
+    "collected": 555,
+    "candidates": 123,
     "evaluated": 0,
     "sent": 0,
     "errors": [
